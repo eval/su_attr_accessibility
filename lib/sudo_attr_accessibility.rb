@@ -1,3 +1,5 @@
+require 'active_support'
+
 module SudoAttrAccessibility
   extend ActiveSupport::Concern
 
@@ -72,4 +74,4 @@ module SudoAttrAccessibility
     end
   end
 end
-ActiveRecord::Base.send(:include, SudoAttrAccessibility)
+ActiveRecord::Base.send(:include, SudoAttrAccessibility) if defined?(ActiveRecord)
