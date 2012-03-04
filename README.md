@@ -3,7 +3,7 @@
 Using attr_accessible you can explicitly define what attributes of a model can be assigned.
 As of Rails 3.1 this got even better as you can define different lists of attributes for different roles.
 
-While this is all good and fine to protect your models from malicious input from outside (handled mostly in controllers), it will also make other uses of your models somewhat harder: e.g. when testing or when in the console.
+While this is all good and fine to protect your models from malicious input from outside (handled mostly in controllers), it will also make other interactions with your models somewhat harder: e.g. when testing or when in the console you always have to pass a role which can access the correct attributes.
 
 This gem tries to solve this by letting you define roles that are allowed to access all attribites. It even makes it possible to forget all this role-stuff and only explicitly use roles in places where it matters (again: mostly in controllers).
 
@@ -72,3 +72,7 @@ Enabling this behaviour by default for all subclasses of AR:
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Author
+
+Gert Goet (eval) :: gert@thinkcreate.nl :: @gertgoet
