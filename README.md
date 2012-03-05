@@ -1,4 +1,4 @@
-# SudoAttrAccessibility
+# SuAttrAccessibility
 
 Using attr_accessible you can explicitly define what attributes of a model can be assigned.
 As of Rails 3.1 this got even better as you can define different lists of attributes for different roles.
@@ -11,7 +11,7 @@ This gem tries to solve this by letting you define roles that are allowed to acc
 
 Add this line to your application's Gemfile:
 
-    gem 'sudo_attr_accessibility'
+    gem 'su_attr_accessibility'
 
 And then execute:
 
@@ -19,7 +19,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install sudo_attr_accessibility
+    $ gem install su_attr_accessibility
 
 ## Usage
 
@@ -31,7 +31,7 @@ Or install it yourself as:
       attr_accessible :email
 
       # the admin-role can access all...
-      sudo_attr_accessible_as :admin
+      su_attr_accessible_as :admin
 
       # ...even attributes defined later on
       attr_accessor :current_step
@@ -49,7 +49,7 @@ Or install it yourself as:
     p2.account      # => <Account ...>
 ```
 
-Alternatively the default-role is passed to sudo_attr_accessible_as and
+Alternatively the default-role is passed to su_attr_accessible_as and
 another role is used for attr_accessible. This is more convenient when
 working in the console for example (no ':as => :role' is needed) though
 is less secure of course.
@@ -59,7 +59,7 @@ Enabling this behaviour by default for all subclasses of AR:
 ```ruby
     class ActiveRecord::Base
       def self.inherited(child_class)
-        child_class.class_eval{ sudo_attr_accessible_as :default }
+        child_class.class_eval{ su_attr_accessible_as :default }
         super
       end
     end

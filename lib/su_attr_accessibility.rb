@@ -1,6 +1,6 @@
 require 'active_support'
 
-module SudoAttrAccessibility
+module SuAttrAccessibility
   extend ActiveSupport::Concern
 
   module ClassMethods
@@ -8,13 +8,15 @@ module SudoAttrAccessibility
     #
     # @example
     #   class Person < ActiveRecord::Base
+    #     include SuAttrAccessibility
+    #
     #     belongs_to :account
     #
     #     # attributes mass-assignable as role default
     #     attr_accessible :email
     #
     #     # the admin-role can access all...
-    #     sudo_attr_accessible_as :admin
+    #     su_attr_accessible_as :admin
     #
     #     # ...even attributes defined later on
     #     attr_accessor :current_step
@@ -31,7 +33,7 @@ module SudoAttrAccessibility
     #   p2.current_step # => 2
     #   p2.account      # => <Account ...>
     #
-    #   Alternatively the default-role is passed to sudo_attr_accessible_as and
+    #   Alternatively the default-role is passed to su_attr_accessible_as and
     #   another role is used for attr_accessible. This is more convenient when
     #   working in the console for example (no ':as => :role' is needed) though
     #   is less secure of course.
@@ -39,25 +41,25 @@ module SudoAttrAccessibility
     #   Enabling this behaviour by default for all subclasses of AR:
     #   class ActiveRecord::Base
     #     def self.inherited(child_class)
-    #       child_class.class_eval{ sudo_attr_accessible_as :default }
+    #       child_class.class_eval{ su_attr_accessible_as :default }
     #       super
     #     end
     #   end
-    def sudo_attr_accessible_as(*roles)
+    def su_attr_accessible_as(*roles)
       re_method_filter = %r{(.+)=\z}
 
       # take care of any future attribute
-      unless respond_to?(:method_added_with_sudo_attr_accessibility)
+      unless respond_to?(:method_added_with_su_attr_accessibility)
         class_eval %{
-          def self.method_added_with_sudo_attr_accessibility(m)
+          def self.method_added_with_su_attr_accessibility(m)
             if attribute = m.to_s[#{re_method_filter.inspect}, 1]
               attr_accessible attribute, :as => #{roles.inspect}
           end
-            method_added_without_sudo_attr_accessibility(m)
+            method_added_without_su_attr_accessibility(m)
             end
 
             class << self
-            alias_method_chain :method_added, :sudo_attr_accessibility
+            alias_method_chain :method_added, :su_attr_accessibility
             end
         }, __FILE__, __LINE__ + 1
       end
@@ -74,4 +76,4 @@ module SudoAttrAccessibility
     end
   end
 end
-ActiveRecord::Base.send(:include, SudoAttrAccessibility) if defined?(ActiveRecord)
+ActiveRecord::Base.send(:include, SuAttrAccessibility) if defined?(ActiveRecord)

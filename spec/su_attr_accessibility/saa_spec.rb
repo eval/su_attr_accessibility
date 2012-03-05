@@ -14,13 +14,13 @@ ActiveRecord::Schema.define do
 end
 
 class Person < ActiveRecord::Base
-  include SudoAttrAccessibility
+  include SuAttrAccessibility
 
   attr_accessible :name
-  sudo_attr_accessible_as :admin
+  su_attr_accessible_as :admin
 end
 
-describe SudoAttrAccessibility do
+describe SuAttrAccessibility do
   it "let's admin assign protected attributes" do
     p1 = Person.new(:age => 12)
     p1.age.should be_nil
