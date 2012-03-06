@@ -26,10 +26,10 @@ end
 > params = {:name => 'Gert', :is_admin => true}
 > user = User.new(params, :as => :user_input)
 WARNING: Can't mass-assign protected attributes: is_admin
-=> "#<User id: nil, name: "Gert", is_admin: nil>"
+=> #<User id: nil, name: "Gert", is_admin: nil>
 ```
 
-While this is all good and fine for handling params in controllers, a whole lot of other parts of your application (e.g. tests, the console, any non-controller code) probably doesn't want to deal with these restrictions.
+While this is all good and fine for handling params in controllers, a whole lot of other parts of your application (e.g. tests, the console, any non-controller code) probably don't want to deal with these restrictions.
 
 Though you could use `:without_protection => true` to bypass these restrictions, this gem let's you define a role that essentialy does the same:
 
@@ -41,9 +41,9 @@ end
 
 > params = {:name => 'Gert', :is_admin => true}
 > user = User.new(params, :without_protection => true)
-=> "#<User id: nil, name: "Gert", is_admin: true>"
+=> #<User id: nil, name: "Gert", is_admin: true>
 > user = User.new(params, :as => :admin)
-=> "#<User id: nil, name: "Gert", is_admin: true>"
+=> #<User id: nil, name: "Gert", is_admin: true>
 ```
 
 ## But wait, there's more!
@@ -60,12 +60,12 @@ end
 # on the console and in our tests:
 > params = {:name => 'Gert', :is_admin => true}
 > user = User.new(params)
-=> "#<User id: nil, name: "Gert", is_admin: true>"
+=> #<User id: nil, name: "Gert", is_admin: true>
 
 # in our controllers we keep using the user_input-role:
 > user = User.new(params, :as => :user_input)
 WARNING: Can't mass-assign protected attributes: is_admin
-=> "#<User id: nil, name: "Gert", is_admin: nil>"
+=> #<User id: nil, name: "Gert", is_admin: nil>
 ```
 
 ## Installation
