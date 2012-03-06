@@ -38,13 +38,6 @@ module SuAttrAccessibility
     #   working in the console for example (no ':as => :role' is needed) though
     #   is less secure of course.
     #
-    #   Enabling this behaviour by default for all subclasses of AR:
-    #   class ActiveRecord::Base
-    #     def self.inherited(child_class)
-    #       child_class.class_eval{ su_attr_accessible_as :default }
-    #       super
-    #     end
-    #   end
     def su_attr_accessible_as(*roles)
       re_method_filter = %r{(.+)=\z}
 
