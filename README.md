@@ -1,11 +1,72 @@
 # SuAttrAccessibility
 
-Using attr_accessible you can explicitly define what attributes of a model can be assigned.
-As of Rails 3.1 this got even better as you can define different lists of attributes for different roles.
+## Usage
 
-While this is all good and fine to protect your models from malicious input from outside (handled mostly in controllers), it will also make other interactions with your models somewhat harder: e.g. when testing or when in the console you always have to pass a role which can access the correct attributes.
+Using `attr_accessible` you can explicitly define what attributes of a model can be mass assigned.
+As of Rails 3.1 you can even specify these attributes per role.
 
-This gem tries to solve this by letting you define roles that are allowed to access all attribites. It even makes it possible to forget all this role-stuff and only explicitly use roles in places where it matters (again: mostly in controllers).
+So given the following model:
+
+```ruby
+# app/models/user.rb
+
+# Table name: users
+#
+#  id                     :integer(4)      not null, primary key
+#  name                   :string(255)
+#  is_admin               :boolean(1)
+class User < ActiveRecord::Base
+  attr_accessible :name, :as => :user_input
+end
+```
+
+...we stay safe when POSTed (possibly malicious) data is involved in mass assignment:
+
+```ruby
+> params = {:name => 'Gert', :is_admin => true}
+> user = User.new(params, :as => :user_input)
+WARNING: Can't mass-assign protected attributes: is_admin
+=> "#<User id: nil, name: "Gert", is_admin: nil>"
+```
+
+While this is all good and fine for handling params in controllers, a whole lot of other parts of your application (e.g. tests, the console, any non-controller code) probably doesn't want to deal with these restrictions.
+
+Though you could use `:without_protection => true` to bypass these restrictions, this gem let's you define a role that essentialy does the same:
+
+```ruby
+class User < ActiveRecord::Base
+  attr_accessible :name, :as => :user_input
+  su_attr_accessible_as :admin
+end
+
+> params = {:name => 'Gert', :is_admin => true}
+> user = User.new(params, :without_protection => true)
+=> "#<User id: nil, name: "Gert", is_admin: true>"
+> user = User.new(params, :as => :admin)
+=> "#<User id: nil, name: "Gert", is_admin: true>"
+```
+
+## But wait, there's more!
+
+Do we really care about any role when we're *not* dealing with submitted data? Probably not.
+This is when this gem is even better: we can pass the default-role to `su_attr_accessible_as` and forget about any role except for the parts where we really care:
+
+```ruby
+class User < ActiveRecord::Base
+  attr_accessible :name, :as => :user_input
+  su_attr_accessible_as :default
+end
+
+# on the console and in our tests:
+> params = {:name => 'Gert', :is_admin => true}
+> user = User.new(params)
+=> "#<User id: nil, name: "Gert", is_admin: true>"
+
+# in our controllers we keep using the user_input-role:
+> user = User.new(params, :as => :user_input)
+WARNING: Can't mass-assign protected attributes: is_admin
+=> "#<User id: nil, name: "Gert", is_admin: nil>"
+```
 
 ## Installation
 
@@ -21,49 +82,6 @@ Or install it yourself as:
 
     $ gem install su_attr_accessibility
 
-## Usage
-
-```ruby
-    class Person < ActiveRecord::Base
-      belongs_to :account
-
-      # attributes mass-assignable as role default
-      attr_accessible :email
-
-      # the admin-role can access all...
-      su_attr_accessible_as :admin
-
-      # ...even attributes defined later on
-      attr_accessor :current_step
-    end
-
-    p1 = Person.new(:email => 'person1@example.org', :active => true)
-    p1.email    # => 'person1@example.org'
-    p1.active   # => nil
-    p2 = Person.new({:email => 'person1@example.org', :active => true,
-                      :account => Account.first, :current_step => 1},
-                      :as => :admin)
-    p2.email        # => 'person1@example.org'
-    p2.active       # => true
-    p2.current_step # => 2
-    p2.account      # => <Account ...>
-```
-
-Alternatively the default-role is passed to su_attr_accessible_as and
-another role is used for attr_accessible. This is more convenient when
-working in the console for example (no ':as => :role' is needed) though
-is less secure of course.
-
-Enabling this behaviour by default for all subclasses of AR:
-
-```ruby
-    class ActiveRecord::Base
-      def self.inherited(child_class)
-        child_class.class_eval{ su_attr_accessible_as :default }
-        super
-      end
-    end
-```
 
 ## Contributing
 
