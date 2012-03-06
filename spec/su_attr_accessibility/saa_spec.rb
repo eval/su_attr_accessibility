@@ -14,18 +14,24 @@ ActiveRecord::Schema.define do
 end
 
 class Person < ActiveRecord::Base
-  include SuAttrAccessibility
+  su_attr_accessible_as :default
 
-  attr_accessible :name
-  su_attr_accessible_as :admin
+  attr_accessible :name, :as => :form1
 end
 
 describe SuAttrAccessibility do
-  it "let's admin assign protected attributes" do
-    p1 = Person.new(:age => 12)
-    p1.age.should be_nil
+  it "allows all input from default" do
 
-    p2 = Person.new({:age => 12}, :as => :admin)
-    p2.age.should == 12
+    params1    = {'age' => 12, 'name' => 'Gert'}
+    expected1  = {'age' => nil, 'name' => 'Gert'}
+
+    p1 = Person.new(params1, :as => :form1)
+    p1.attributes.slice(*params1.keys).should == expected1
+
+    params2    = {'age' => 12, 'name' => 'Gert'}
+    expected2  = params2
+
+    p2 = Person.new(params2)
+    p2.attributes.slice(*params2.keys).should == expected2
   end
 end
